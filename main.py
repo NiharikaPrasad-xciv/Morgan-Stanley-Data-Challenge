@@ -61,7 +61,7 @@ def sentiment_analysis(ticker_df, ticker):
     ticker_df_sent = ticker_df[
         ['created_at', 'tweet', 'language', 'sentiment_polarity', 'sentiment_subjectivity', 'sentiment_assessment']]
     ticker_df_sent = ticker_df_sent[ticker_df_sent['language'] == 'en']
-    ticker_df_sent = ticker_df_sent[(pep_sent['sentiment_polarity'] != 0) & (pep_sent['sentiment_subjectivity'] != 0)]
+    ticker_df_sent = ticker_df_sent[(ticker_df_sent['sentiment_polarity'] != 0) & (ticker_df_sent['sentiment_subjectivity'] != 0)]
     ticker_df_sent.to_csv(f'{ticker}_sent.csv', index=None)
     ticker_df_sent.groupby('created_at').describe()
     return ticker_df_sent

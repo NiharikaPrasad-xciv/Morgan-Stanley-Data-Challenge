@@ -1,3 +1,6 @@
+# scrape_reddit.py
+# Author(s): Niharika Prasad
+
 import praw
 import datetime as dt
 from psaw import PushshiftAPI

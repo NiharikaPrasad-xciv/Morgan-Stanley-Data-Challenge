@@ -1,8 +1,10 @@
 # main.py
 # Author(s): Nitin Sharma
+#            Niharika Prasad
 
 from data_fetcher import DataFetcher
 import pandas as pd
+
 from textblob import TextBlob
 
 data = DataFetcher.fetch(['AAL', 'DIS', 'PEP', '^GSPC'])
@@ -31,7 +33,6 @@ pep_sent = pep_sent[(pep_sent['sentiment_polarity'] != 0) & (pep_sent['sentiment
 pep_sent.to_csv('pep_sent.csv', index=None)
 
 
-####
 def add_csv(ticker):
     df = pd.read_csv(f'tweets/{ticker}.csv')
     print(len(df))
@@ -52,6 +53,13 @@ pep_tweets = pep_tweets.drop_duplicates(keep=False, inplace=True)
 dis_tweets = dis_tweets.drop_duplicates(keep=False, inplace=True)
 
 
+def show_stats(df, ticker):
+    df[['Date', 'Time', 'Timezone']] = df.created_at.str.split(expand=True)
+    df = df.groupby('Date').describe()
+    df.to_csv(f'{ticker}_sentiment_perday.csv', index=None)
+    return df
+
+
 def sentiment_analysis(ticker_df, ticker):
     assessment = ticker_df['tweet'].astype(str).apply(lambda x: TextBlob(x).sentiment_assessments)
     ticker_df['sentiment_polarity'] = assessment.apply(lambda x: x[0])
@@ -61,9 +69,10 @@ def sentiment_analysis(ticker_df, ticker):
     ticker_df_sent = ticker_df[
         ['created_at', 'tweet', 'language', 'sentiment_polarity', 'sentiment_subjectivity', 'sentiment_assessment']]
     ticker_df_sent = ticker_df_sent[ticker_df_sent['language'] == 'en']
-    ticker_df_sent = ticker_df_sent[(ticker_df_sent['sentiment_polarity'] != 0) & (ticker_df_sent['sentiment_subjectivity'] != 0)]
+    ticker_df_sent = ticker_df_sent[
+        (ticker_df_sent['sentiment_polarity'] != 0) & (ticker_df_sent['sentiment_subjectivity'] != 0)]
     ticker_df_sent.to_csv(f'{ticker}_sent.csv', index=None)
-    ticker_df_sent.groupby('created_at').describe()
+
     return ticker_df_sent
 
 
@@ -73,7 +82,4 @@ pep_tweets = pd.read_csv('pepsi_tweets.csv')
 pep_tweet_analysis = sentiment_analysis(pep_tweets, 'pep')
 dis_tweets = pd.read_csv('dis_tweets.csv')
 dis_tweet_analysis = sentiment_analysis(dis_tweets, 'dis')
-
-
-def show_stats(df):
-    df = df.groupby('created_at').des
+dis_sentiment_describe = show_stats(dis_tweet_analysis, 'dis')
